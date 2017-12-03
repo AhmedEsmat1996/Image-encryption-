@@ -44,6 +44,10 @@ namespace ImageQuantization
             this.txtGaussSigma = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.text_seed = new System.Windows.Forms.TextBox();
+            this.text_tap = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaskSize)).BeginInit();
@@ -243,11 +247,52 @@ namespace ImageQuantization
             this.panel2.Size = new System.Drawing.Size(560, 456);
             this.panel2.TabIndex = 16;
             // 
+            // text_seed
+            // 
+            this.text_seed.Location = new System.Drawing.Point(157, 527);
+            this.text_seed.Multiline = true;
+            this.text_seed.Name = "text_seed";
+            this.text_seed.Size = new System.Drawing.Size(89, 27);
+            this.text_seed.TabIndex = 17;
+            // 
+            // text_tap
+            // 
+            this.text_tap.Location = new System.Drawing.Point(157, 577);
+            this.text_tap.Multiline = true;
+            this.text_tap.Name = "text_tap";
+            this.text_tap.Size = new System.Drawing.Size(89, 27);
+            this.text_tap.TabIndex = 18;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Location = new System.Drawing.Point(44, 529);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(59, 25);
+            this.label7.TabIndex = 19;
+            this.label7.Text = "Seed";
+            this.label7.Click += new System.EventHandler(this.label7_Click);
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.Location = new System.Drawing.Point(42, 577);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(39, 25);
+            this.label8.TabIndex = 20;
+            this.label8.Text = "tap";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1205, 615);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.text_tap);
+            this.Controls.Add(this.text_seed);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.txtGaussSigma);
@@ -295,6 +340,10 @@ namespace ImageQuantization
         private System.Windows.Forms.TextBox txtGaussSigma;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.TextBox text_seed;
+        private System.Windows.Forms.TextBox text_tap;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
     }
 }
 

@@ -243,6 +243,47 @@ namespace ImageQuantization
 
             return Filtered;
         }
+        public static string GET_Key(ref string seed, int tap)
+        {
+           // char [] arr;
+            string key = "";
+            for (int i = 0; i < 8; i++)
+            {
+               
+               int res =(seed[0]-48^seed[tap]-48);
+               seed = seed.Substring(1, seed.Length - 1);
+               seed += (char)(res + 48);
+               key += (char)(res + 48);
+            }
+
+           // arr = key.ToCharArray();
+           //  Array.Reverse(arr);
+           //  key = arr.ToString();
+            return key;
+        }
+        public static RGBPixel [,] encrypt_image(RGBPixel[,] ImageMatrix, string seed,int tap)
+        {
+            string Rkey = GET_Key(ref seed, tap);
+            string Gkey = GET_Key(ref seed, tap);
+            string Bkey = GET_Key(ref seed, tap);
+            int hight = GetHeight(ImageMatrix);
+            int width = GetWidth(ImageMatrix);
+            MessageBox.Show(Rkey+" "+Gkey+" "+Bkey);
+            for (int i = 0; i < hight; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    ImageMatrix[i, j].red = (byte)(ImageMatrix[i, j].red ^ Convert.ToByte(Rkey,2));
+                    ImageMatrix[i, j].green = (byte)(ImageMatrix[i, j].green ^ Convert.ToByte(Gkey, 2));
+                    ImageMatrix[i, j].blue = (byte)(ImageMatrix[i, j].blue ^ Convert.ToByte(Bkey, 2));
+
+
+
+                }
+            }
+
+            return ImageMatrix;
+        }
 
 
     }

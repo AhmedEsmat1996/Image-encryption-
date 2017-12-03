@@ -5,3 +5,11 @@ C:\Users\Dell\Desktop\[ALG'17] Lab8 - [PROJECT] + Priority Queue\[TEMPLATE] Imag
 C:\Users\Dell\Desktop\[ALG'17] Lab8 - [PROJECT] + Priority Queue\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\bin\Debug\ImageEncryptCompress.pdb
 C:\Users\Dell\Desktop\[ALG'17] Lab8 - [PROJECT] + Priority Queue\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.exe
 C:\Users\Dell\Desktop\[ALG'17] Lab8 - [PROJECT] + Priority Queue\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.pdb
+F:\algo\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.exe
+F:\algo\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.pdb
+F:\algo\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\bin\Debug\ImageEncryptCompress.exe
+F:\algo\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\bin\Debug\ImageEncryptCompress.pdb
+F:\algo\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.csprojResolveAssemblyReference.cache
+F:\algo\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\obj\Debug\ImageQuantization.MainForm.resources
+F:\algo\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.Properties.Resources.resources
+F:\algo\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.csproj.GenerateResource.Cache
