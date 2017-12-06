@@ -21,8 +21,8 @@ namespace ImageQuantization
     {
         public double red, green, blue;
     }
-    
-  
+
+
     /// <summary>
     /// Library of static functions that deal with images
     /// </summary>
@@ -92,7 +92,7 @@ namespace ImageQuantization
 
             return Buffer;
         }
-        
+
         /// <summary>
         /// Get the height of the image 
         /// </summary>
@@ -152,13 +152,13 @@ namespace ImageQuantization
         }
 
 
-       /// <summary>
-       /// Apply Gaussian smoothing filter to enhance the edge detection 
-       /// </summary>
-       /// <param name="ImageMatrix">Colored image matrix</param>
-       /// <param name="filterSize">Gaussian mask size</param>
-       /// <param name="sigma">Gaussian sigma</param>
-       /// <returns>smoothed color image</returns>
+        /// <summary>
+        /// Apply Gaussian smoothing filter to enhance the edge detection 
+        /// </summary>
+        /// <param name="ImageMatrix">Colored image matrix</param>
+        /// <param name="filterSize">Gaussian mask size</param>
+        /// <param name="sigma">Gaussian sigma</param>
+        /// <returns>smoothed color image</returns>
         public static RGBPixel[,] GaussianFilter1D(RGBPixel[,] ImageMatrix, int filterSize, double sigma)
         {
             int Height = GetHeight(ImageMatrix);
@@ -167,7 +167,7 @@ namespace ImageQuantization
             RGBPixelD[,] VerFiltered = new RGBPixelD[Height, Width];
             RGBPixel[,] Filtered = new RGBPixel[Height, Width];
 
-           
+
             // Create Filter in Spatial Domain:
             //=================================
             //make the filter ODD size
@@ -245,42 +245,74 @@ namespace ImageQuantization
         }
         public static string GET_Key(ref string seed, int tap)
         {
-           // char [] arr;
+
             string key = "";
             for (int i = 0; i < 8; i++)
             {
-               
-               int res =(seed[0]-48^seed[tap]-48);
-               seed = seed.Substring(1, seed.Length - 1);
-               seed += (char)(res + 48);
-               key += (char)(res + 48);
+
+                int res = (seed[0] - 48 ^ seed[seed.Length - tap - 1] - 48);
+                //      MessageBox.Show( seed[0]+ "xor"+ seed[seed.Length - 1 - tap]+"   " +res.ToString()+" "+tap);
+                seed = seed.Substring(1, seed.Length - 1);
+                seed += (char)(res + 48);
+                key += (char)(res + 48);
             }
 
-           // arr = key.ToCharArray();
-           //  Array.Reverse(arr);
-           //  key = arr.ToString();
+            //char[] arr = key.ToCharArray();
+            //  Array.Reverse(arr);
+            //  key = arr.ToString();
             return key;
         }
-        public static RGBPixel [,] encrypt_image(RGBPixel[,] ImageMatrix, string seed,int tap)
+        public static RGBPixel[,] encrypt_image(RGBPixel[,] ImageMatrix, string seed, int tap)
         {
-            string Rkey = GET_Key(ref seed, tap);
-            string Gkey = GET_Key(ref seed, tap);
-            string Bkey = GET_Key(ref seed, tap);
+
             int hight = GetHeight(ImageMatrix);
             int width = GetWidth(ImageMatrix);
-            MessageBox.Show(Rkey+" "+Gkey+" "+Bkey);
+
+            // MessageBox.Show(Rkey+ " "+Gkey+" "+Bkey);
+
+            for (int i = 0; i < seed.Length; i++)
+            {
+                if (seed[i] != '0' && seed[i] != '1')
+                {
+
+                    string seed_alpha = "";
+                    for (int j = 0; j < seed.Length; j++)
+                        seed_alpha += Convert.ToString(seed[j], 2);
+
+                    seed = seed_alpha;
+                    break;
+                }
+            }
+            Dictionary<int, int> Rvalues = new Dictionary<int, int>();
             for (int i = 0; i < hight; i++)
             {
                 for (int j = 0; j < width; j++)
                 {
-                    ImageMatrix[i, j].red = (byte)(ImageMatrix[i, j].red ^ Convert.ToByte(Rkey,2));
+                    Rvalues[ImageMatrix[i, j].red] = 0;
+                }
+            }
+
+            for (int i = 0; i < hight; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+
+                  Rvalues[ImageMatrix[i, j].red]++;
+                    string Rkey = GET_Key(ref seed, tap);
+                    string Gkey = GET_Key(ref seed, tap);
+                    string Bkey = GET_Key(ref seed, tap);
+
+                    ImageMatrix[i, j].red = (byte)(ImageMatrix[i, j].red ^ Convert.ToByte(Rkey, 2));
                     ImageMatrix[i, j].green = (byte)(ImageMatrix[i, j].green ^ Convert.ToByte(Gkey, 2));
                     ImageMatrix[i, j].blue = (byte)(ImageMatrix[i, j].blue ^ Convert.ToByte(Bkey, 2));
 
-
-
                 }
             }
+            //MessageBox.Show(Rvalues.Count.ToString());
+            //foreach (KeyValuePair<int, int> kvp in Rvalues)
+            //{
+            //    MessageBox.Show(kvp.Key + "   " + kvp.Value);
+            //}
 
             return ImageMatrix;
         }

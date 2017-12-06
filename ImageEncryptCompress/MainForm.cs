@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Text;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace ImageQuantization
@@ -33,10 +34,14 @@ namespace ImageQuantization
 
         private void btnGaussSmooth_Click(object sender, EventArgs e)
         {
-           // double sigma = double.Parse(txtGaussSigma.Text);
-           // int maskSize = (int)nudMaskSize.Value ;
-          //  ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, maskSize, sigma);
+            // double sigma = double.Parse(txtGaussSigma.Text);
+            // int maskSize = (int)nudMaskSize.Value ;
+            //  ImageMatrix = ImageOperations.GaussianFilter1D(ImageMatrix, maskSize, sigma);
+
+           // Stopwatch sw = Stopwatch.StartNew();
             ImageMatrix = ImageOperations.encrypt_image(ImageMatrix, text_seed.Text, Convert.ToInt32(text_tap.Text));
+         // sw.Stop();
+           //MessageBox.Show(((double)sw.ElapsedMilliseconds / 1000).ToString());
             ImageOperations.DisplayImage(ImageMatrix, pictureBox2);
             
         }
