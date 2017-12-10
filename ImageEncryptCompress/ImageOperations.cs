@@ -5,6 +5,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
 using PriorityQueueDemo;
+using Huffman1;
+using System.IO;
 ///Algorithms Project
 ///Intelligent Scissors
 ///
@@ -285,34 +287,12 @@ namespace ImageQuantization
                 }
             }
             //hold color values number fo exsistance
-            Dictionary<int, int> Rvalues = new Dictionary<int, int>();
-            Dictionary<int, int> Gvalues = new Dictionary<int, int>();
-            Dictionary<int, int> Bvalues = new Dictionary<int, int>();
-            PriorityQueue<int,int> Rqueue = new PriorityQueue<int,int>();
-            PriorityQueue<int,int> Gqueue = new PriorityQueue<int,int>();
-            PriorityQueue<int,int> Bqueue = new PriorityQueue<int,int>();
-
-
-            ///initiallize dictionary with 0
+           
             for (int i = 0; i < hight; i++)
             {
                 for (int j = 0; j < width; j++)
                 {
-                    Rvalues[ImageMatrix[i, j].red] = 0;
-                    Gvalues[ImageMatrix[i, j].green] = 0;
-                    Bvalues[ImageMatrix[i, j].blue] = 0;
-                }
-            }
-
-            for (int i = 0; i < hight; i++)
-            {
-                for (int j = 0; j < width; j++)
-                {
-                    //when exist 
-                  Rvalues[ImageMatrix[i, j].red]++;
-                  Gvalues[ImageMatrix[i, j].green]++;
-                  Bvalues[ImageMatrix[i, j].blue]++;
-
+                 
                     string Rkey = GET_Key(ref seed, tap);
                     string Gkey = GET_Key(ref seed, tap);
                     string Bkey = GET_Key(ref seed, tap);
@@ -324,36 +304,103 @@ namespace ImageQuantization
                 }
             }
             //store histogram to priority queue
-            foreach (KeyValuePair<int, int> kvp in Rvalues)
-            {
-              Rqueue.Enqueue(kvp.Value,kvp.Key);
-             
-             }
-           //while(!Rqueue.IsEmpty)
-           // {
-           //     //Rqueue.Enqueue(kvp.Value, kvp.Key);
-           //     MessageBox.Show(Rqueue.Dequeue().Key + " " + Rqueue.Dequeue().Value);
-           // }
-            foreach (KeyValuePair<int, int> kvp in Gvalues)
-            {
-              Rqueue.Enqueue(kvp.Value,kvp.Key);
-            }
-             foreach (KeyValuePair<int, int> kvp in Bvalues)
-            {
-              Rqueue.Enqueue(kvp.Value,kvp.Key);
-            }
-            
-
-            //MessageBox.Show(Rvalues.Count.ToString());
-            //foreach (KeyValuePair<int, int> kvp in Rvalues)
-            //{
-            //    MessageBox.Show(kvp.Key + "   " + kvp.Value);
-            //}
+          
 
             return ImageMatrix;
         }
-       
 
+        public static void huffman_encoding(RGBPixel[,] ImageMatrix)
+        {
+
+
+            Dictionary<int, int> Rvalues = new Dictionary<int, int>();
+            Dictionary<int, int> Gvalues = new Dictionary<int, int>();
+            Dictionary<int, int> Bvalues = new Dictionary<int, int>();
+
+            int hight = GetHeight(ImageMatrix);
+            int width = GetWidth(ImageMatrix);
+
+            ///initiallize dictionary with 0
+            for (int i = 0; i < hight; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    Rvalues[ImageMatrix[i, j].red] = 0;
+                    Gvalues[ImageMatrix[i, j].green] = 0;
+                    Bvalues[ImageMatrix[i, j].blue] = 0;
+                }
+            }
+            for (int i = 0; i < hight; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                       //when exist 
+                  Rvalues[ImageMatrix[i, j].red]++;
+                  Gvalues[ImageMatrix[i, j].green]++;
+                  Bvalues[ImageMatrix[i, j].blue]++;
+
+                }
+            }
+            HuffmanTree tree1 = new HuffmanTree(Rvalues);
+            HuffmanTree tree2 = new HuffmanTree(Gvalues);
+            HuffmanTree tree3 = new HuffmanTree(Bvalues);
+            Dictionary<int, string> Redtree = tree1.CreateEncodings();
+            Dictionary<int, string> Greentree = tree2.CreateEncodings();
+            Dictionary<int, string> bluetree = tree3.CreateEncodings();
+            long Rcount = 0;
+            long Gcount = 0;
+            long Bcount = 0;
+            FileStream fs = new FileStream("huffman_output.txt", FileMode.Truncate);
+            StreamWriter sw = new StreamWriter(fs);
+            sw.WriteLine("--R--");
+            sw.WriteLine("Color - Frequency - Huffman Representation - Total Bits");
+             
+            //red
+            foreach (KeyValuePair<int, string> kvp in Redtree)
+            {
+                sw.Write(kvp.Key + " - " + Rvalues[kvp.Key] + " - " + kvp.Value + " - " + kvp.Value.Length * Rvalues[kvp.Key]);
+                sw.WriteLine();
+                Rcount += kvp.Value.Length * Rvalues[kvp.Key];
+            }
+            sw.WriteLine("Total = "+ Rcount);
+            sw.WriteLine();
+            sw.WriteLine("--G--");
+            //green
+            foreach (KeyValuePair<int, string> kvp in Greentree)
+            {
+                sw.Write(kvp.Key + " - " + Gvalues[kvp.Key] + " - " + kvp.Value + " - " + kvp.Value.Length * Gvalues[kvp.Key]);
+                sw.WriteLine();
+                Gcount += kvp.Value.Length * Gvalues[kvp.Key];
+            }
+            sw.WriteLine("Total = " + Gcount);
+            sw.WriteLine();
+            sw.WriteLine("--B--");
+
+            //blue
+            foreach (KeyValuePair<int, string> kvp in bluetree)
+            {
+                sw.Write(kvp.Key + " - " + Bvalues[kvp.Key] + " - " + kvp.Value + " - " + kvp.Value.Length * Bvalues[kvp.Key]);
+                sw.WriteLine();
+                Bcount += kvp.Value.Length * Bvalues[kvp.Key];
+            }
+            sw.WriteLine("Total = " + Bcount);
+            sw.WriteLine();
+            sw.WriteLine("**Compression Output**");
+            sw.WriteLine(Rcount + Gcount + Bcount +" bytes");
+            sw.Close();
+            MessageBox.Show("saved");
+
+
+
+           
+
+           
+
+
+
+
+        }
+            
 
     }
 }

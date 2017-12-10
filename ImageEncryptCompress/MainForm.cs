@@ -51,6 +51,12 @@ namespace ImageQuantization
 
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            ImageMatrix = ImageOperations.encrypt_image(ImageMatrix, text_seed.Text, Convert.ToInt32(text_tap.Text));
+            ImageOperations.huffman_encoding(ImageMatrix);
+        }
+
        
        
     }
