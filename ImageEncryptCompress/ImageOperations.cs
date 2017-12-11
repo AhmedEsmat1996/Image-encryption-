@@ -4,7 +4,7 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
-using PriorityQueueDemo;
+
 using Huffman1;
 using System.IO;
 ///Algorithms Project
@@ -254,15 +254,12 @@ namespace ImageQuantization
             {
 
                 int res = (seed[0] - 48 ^ seed[seed.Length - tap - 1] - 48);
-                //      MessageBox.Show( seed[0]+ "xor"+ seed[seed.Length - 1 - tap]+"   " +res.ToString()+" "+tap);
                 seed = seed.Substring(1, seed.Length - 1);
                 seed += (char)(res + 48);
                 key += (char)(res + 48);
             }
 
-            //char[] arr = key.ToCharArray();
-            //  Array.Reverse(arr);
-            //  key = arr.ToString();
+           
             return key;
         }
         public static RGBPixel[,] encrypt_image(RGBPixel[,] ImageMatrix, string seed, int tap)
@@ -271,7 +268,7 @@ namespace ImageQuantization
             int hight = GetHeight(ImageMatrix);
             int width = GetWidth(ImageMatrix);
 
-            // MessageBox.Show(Rkey+ " "+Gkey+" "+Bkey);
+           
 
             for (int i = 0; i < seed.Length; i++)
             {
@@ -303,8 +300,7 @@ namespace ImageQuantization
 
                 }
             }
-            //store histogram to priority queue
-          
+           
 
             return ImageMatrix;
         }
@@ -350,7 +346,7 @@ namespace ImageQuantization
             long Rcount = 0;
             long Gcount = 0;
             long Bcount = 0;
-            FileStream fs = new FileStream("huffman_output.txt", FileMode.Truncate);
+            FileStream fs = new FileStream("huffman_output.txt", FileMode.Create);
             StreamWriter sw = new StreamWriter(fs);
             sw.WriteLine("--R--");
             sw.WriteLine("Color - Frequency - Huffman Representation - Total Bits");
@@ -362,7 +358,7 @@ namespace ImageQuantization
                 sw.WriteLine();
                 Rcount += kvp.Value.Length * Rvalues[kvp.Key];
             }
-            sw.WriteLine("Total = "+ Rcount);
+            sw.WriteLine("*Total = "+ Rcount);
             sw.WriteLine();
             sw.WriteLine("--G--");
             //green
@@ -372,7 +368,7 @@ namespace ImageQuantization
                 sw.WriteLine();
                 Gcount += kvp.Value.Length * Gvalues[kvp.Key];
             }
-            sw.WriteLine("Total = " + Gcount);
+            sw.WriteLine("*Total = " + Gcount);
             sw.WriteLine();
             sw.WriteLine("--B--");
 
@@ -383,20 +379,13 @@ namespace ImageQuantization
                 sw.WriteLine();
                 Bcount += kvp.Value.Length * Bvalues[kvp.Key];
             }
-            sw.WriteLine("Total = " + Bcount);
+        ;
+            sw.WriteLine("*Total = " + Bcount);
             sw.WriteLine();
             sw.WriteLine("**Compression Output**");
-            sw.WriteLine(Rcount + Gcount + Bcount +" bytes");
+            sw.WriteLine((double)(Rcount + Gcount + Bcount) / 8 + " bytes");
             sw.Close();
-            MessageBox.Show("saved");
-
-
-
-           
-
-           
-
-
+            MessageBox.Show("Huffman tree has been saved successflly !");
 
 
         }

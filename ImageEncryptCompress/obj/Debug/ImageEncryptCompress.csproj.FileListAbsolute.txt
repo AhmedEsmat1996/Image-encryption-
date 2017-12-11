@@ -14,3 +14,11 @@ F:\algo\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\obj\Debug\ImageEncr
 F:\algo\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.csproj.GenerateResource.Cache
 F:\algo\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\bin\Debug\ImageEncryptCompress.exe
 F:\algo\[TEMPLATE] ImageEncryptCompress\ImageEncryptCompress\bin\Debug\ImageEncryptCompress.pdb
+E:\سنة ثالتة\ترم اول\Algorithms Analysis and Design\Project\Image-encryption 3\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.exe
+E:\سنة ثالتة\ترم اول\Algorithms Analysis and Design\Project\Image-encryption 3\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.pdb
+E:\سنة ثالتة\ترم اول\Algorithms Analysis and Design\Project\Image-encryption 3\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.csprojResolveAssemblyReference.cache
+E:\سنة ثالتة\ترم اول\Algorithms Analysis and Design\Project\Image-encryption 3\ImageEncryptCompress\obj\Debug\ImageQuantization.MainForm.resources
+E:\سنة ثالتة\ترم اول\Algorithms Analysis and Design\Project\Image-encryption 3\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.Properties.Resources.resources
+E:\سنة ثالتة\ترم اول\Algorithms Analysis and Design\Project\Image-encryption 3\ImageEncryptCompress\obj\Debug\ImageEncryptCompress.csproj.GenerateResource.Cache
+E:\سنة ثالتة\ترم اول\Algorithms Analysis and Design\Project\Image-encryption 3\ImageEncryptCompress\bin\Debug\ImageEncryptCompress.exe
+E:\سنة ثالتة\ترم اول\Algorithms Analysis and Design\Project\Image-encryption 3\ImageEncryptCompress\bin\Debug\ImageEncryptCompress.pdb

@@ -11,7 +11,7 @@ namespace Huffman1
 
         private  SortedDictionary<int, Queue<T>> sd = new SortedDictionary<int, Queue<T>>();
 
-        public int Count { get; private set; }
+        public int Count { get; set; }
 
         public void Enqueue(T item, int priority)
         {
@@ -37,7 +37,7 @@ namespace Huffman1
         public int Count { get; set; }
 
     }
-    internal class HuffmanTree
+    class HuffmanTree
     {
         private  HuffmanNode root;
 
