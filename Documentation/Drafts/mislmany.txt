@@ -1,0 +1,32 @@
+The steps involved in Huffman coding are the following:
+
+1-Examine the frequency and value for each pixel.
+2-Place each value and its frequency into a sorted priority queue. 
+3-Convert the contents of this priority queue into a binary tree. 
+4-Traverse the tree to discover the binary encoding of each character
+5-save the encoded binary version of that value to the destination file.
+
+implementation of a Priority Queue structure built on a SortedDicitionary.
+the Huffmann implementation exposes a constructor which takes a Dictionary that is the frequency mapping for each value. 
+It also exposes Dictionary CreateEncodings() which creates the binary encoding for each value in the map. 
+The HuffmanNode is a basic tree node structure that keeps track of parent, childs, the value it represents and the value's frequency.
+
+
+
+The algorithm places the values and it's frequency into binary tree nodes.
+The nodes are put into a priority queue, which keeps them in sorted order with smaller frequencies at the front of the queue.
+Now the algorithm repeatedly removes two nodes from the front of the queue.
+A new node is created and the two nodes are set as children for the new node; the first node becomes the left child, and the second the right.
+The frequency variable of the new node is set to the accumulated value of the two nodes.
+if the frequency of node n1 was 5 and node n2 was 7 then the frequency of the new node is set to 12.
+The new node is then reinserted into the queue. This process is repeated until the queue contains only one node. This node is the root of the finished Huffman tree.
+The Priority Queue structure is up next. A typical priority queue let's you enqueue an arbitrary set of objects, each if which are associated with a value or priority.
+It then let's you dequeue one object at the time and it automatically makes sure that it's the item with the lowest priority that are dequeued.
+
+
+Next step of the algorithm is calculate the path to discover the binary encoding and by calculating the path from the root down we can create a path from root to node.
+
+we assigned left and right with '0' and '1' we can now construct a binary representation of the path. 
+By using the CreateEncodings() method of HoffmanTree we can create a mapping for each value and binary path.
+This function won't serve more purpose than displaying that the tree has been built correctly.
+

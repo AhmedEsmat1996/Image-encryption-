@@ -1,0 +1,5 @@
+huffman tree -> bytes -"0" of not external node
+huffman representation -> byte array
+width & height  -> int16
+tap ->int16
+seed->string

@@ -4,7 +4,7 @@ using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
-
+using System.Numerics;
 using Huffman1;
 using System.IO;
 ///Algorithms Project
@@ -246,20 +246,18 @@ namespace ImageQuantization
 
             return Filtered;
         }
-        public static string GET_Key(ref string seed, int tap)
+        public static byte GET_Key(ref long  seed, int tap,int len)
         {
-
-            string key = "";
+            
+            byte key = 0;
+            int res;
             for (int i = 0; i < 8; i++)
             {
-
-                int res = (seed[0] - 48 ^ seed[seed.Length - tap - 1] - 48);
-                seed = seed.Substring(1, seed.Length - 1);
-                seed += (char)(res + 48);
-                key += (char)(res + 48);
+               res = ((((seed & (1 << len-1)) != 0)?1:0 )^ (((seed & (1 << tap)) != 0) ? 1 : 0));
+                key =(byte)((key<<1)+res);
+              
+                seed = ((seed << 1) + res);
             }
-
-           
             return key;
         }
         public static RGBPixel[,] encrypt_image(RGBPixel[,] ImageMatrix, string seed, int tap)
@@ -267,36 +265,39 @@ namespace ImageQuantization
 
             int hight = GetHeight(ImageMatrix);
             int width = GetWidth(ImageMatrix);
-
-           
-
+            int seed_alpha =0;
+            long seed2 ;
+            int len;
             for (int i = 0; i < seed.Length; i++)
             {
-                if (seed[i] != '0' && seed[i] != '1')
+                if ((seed[i] != '0' && seed[i] != '1')||seed.Length>64)
                 {
 
-                    string seed_alpha = "";
                     for (int j = 0; j < seed.Length; j++)
-                        seed_alpha += Convert.ToString(seed[j], 2);
+                        seed_alpha += seed[j];
 
-                    seed = seed_alpha;
+                    seed =Convert.ToString(seed_alpha,2);
                     break;
                 }
             }
-            //hold color values number fo exsistance
-           
+             seed2 = Convert.ToInt64(seed, 2);
+             len = seed.Length;
+          
+            byte Rkey;
+            byte Gkey ;
+            byte Bkey;
             for (int i = 0; i < hight; i++)
             {
                 for (int j = 0; j < width; j++)
                 {
                  
-                    string Rkey = GET_Key(ref seed, tap);
-                    string Gkey = GET_Key(ref seed, tap);
-                    string Bkey = GET_Key(ref seed, tap);
+                     Rkey = GET_Key(ref seed2, tap,len);
+                     Gkey = GET_Key(ref seed2, tap,len);
+                     Bkey = GET_Key(ref seed2, tap,len);
 
-                    ImageMatrix[i, j].red = (byte)(ImageMatrix[i, j].red ^ Convert.ToByte(Rkey, 2));
-                    ImageMatrix[i, j].green = (byte)(ImageMatrix[i, j].green ^ Convert.ToByte(Gkey, 2));
-                    ImageMatrix[i, j].blue = (byte)(ImageMatrix[i, j].blue ^ Convert.ToByte(Bkey, 2));
+                    ImageMatrix[i, j].red = (byte)(ImageMatrix[i, j].red ^ Rkey);
+                    ImageMatrix[i, j].green = (byte)(ImageMatrix[i, j].green ^Gkey);
+                    ImageMatrix[i, j].blue = (byte)(ImageMatrix[i, j].blue ^ Bkey);
 
                 }
             }
@@ -305,6 +306,149 @@ namespace ImageQuantization
             return ImageMatrix;
         }
 
+        public static  List<KeyValuePair< RGBPixel[,],KeyValuePair<string,int>>> Hack(RGBPixel[,] ImageMatrix, string seed, int size) // complexity = O(N^2 * 2^size * size).
+        {
+            int hight = GetHeight(ImageMatrix);
+            int width = GetWidth(ImageMatrix);
+          
+            int avg = 0;
+            string ss = "";
+            List<KeyValuePair<RGBPixel[,], KeyValuePair<string, int>>> t = new List<KeyValuePair<RGBPixel[,], KeyValuePair<string, int>>>();
+            int n = Convert.ToInt16(seed, 2);
+         
+            RGBPixel[,] imagecpy = new RGBPixel[hight, width];
+
+
+
+            for (int u = n; u <= Math.Pow(2, size) - 1; u++)
+            {
+                
+                for (int a = 0; a < size; a++)
+                {
+                    RGBPixel[,] image = new RGBPixel[hight, width];
+                    //seed = Convert.ToString(u, 2);
+                    string after = Convert.ToString(u, 2);
+                    string before = "";
+                    for (int k = 0; k < size - after.Length; k++)
+                    {
+                        before += "0";
+                    }
+
+                    seed = before + after;
+                    ss = seed;
+                    int tab = a;
+                    int coun1 = 0, coun2 = 0, coun3 = 0;
+                    imagecpy = (RGBPixel[,])ImageMatrix.Clone();
+                    // int temp = 0;
+                    //for (int y = 0; y < hight; y++)
+                    //    for (int g = 0; g < width; g++)
+                    //        imagecpy[y, g] = ImageMatrix[y, g];
+
+                    Dictionary<int, int> Rvalues = new Dictionary<int, int>();
+                    Dictionary<int, int> Gvalues = new Dictionary<int, int>();
+                    Dictionary<int, int> Bvalues = new Dictionary<int, int>();
+                   
+                    encrypt_image(imagecpy, seed, tab);
+                    //if (u == 2)
+                    //    return ImageMatrix;
+                    for (int i = 0; i < hight; i++)
+                    {
+                        for (int j = 0; j < width; j++)
+                        {
+                            Rvalues[imagecpy[i, j].red] = 0;
+                            Gvalues[imagecpy[i, j].green] = 0;
+                            Bvalues[imagecpy[i, j].blue] = 0;
+                        }
+                    }
+                  
+                    for (int i = 0; i < hight; i++)
+                    {
+                        for (int j = 0; j < width; j++)
+                        {
+                            //when exist 
+                            Rvalues[imagecpy[i, j].red]++;
+                            Gvalues[imagecpy[i, j].green]++;
+                            Bvalues[imagecpy[i, j].blue]++;
+
+                        }
+                    }
+                    
+                    foreach (KeyValuePair<int, int> kvp in Rvalues)
+                    {
+                       
+                       coun1 += kvp.Value;
+
+                    }
+                   coun1 /= Rvalues.Count;
+                    foreach (KeyValuePair<int, int> kvp in Gvalues)
+                    {
+                       
+                            coun2 += kvp.Value;
+                    }
+                    coun2 /= Gvalues.Count;
+                    foreach (KeyValuePair<int, int> kvp in Bvalues)
+                    {
+                       
+                            coun3 += kvp.Value;
+                    }
+                    coun3 /= Bvalues.Count;
+                    //   seed = Convert.ToString(f, 2);
+                    //if (seed == "10001111")
+                    //    MessageBox.Show("found");
+                   
+                    if (coun1+coun2+coun3==avg)
+                    {
+
+                        //if (seed == "1001" && tab == 1)
+                        //{
+
+                        //    MessageBox.Show("found");
+                        //    //for (int y = 0; y < hight; y++)
+                        //    //    for (int g = 0; g < width; g++)
+                        //    //        image[y, g] = imagecpy[y, g];
+
+                        //    //t.Add(image);
+                        //    //return t;
+                        //    //return ImageMatrix;
+                        //}
+
+                        //avg = coun1 + coun2 + coun3;
+                        //for (int y = 0; y < hight; y++)
+                        //    for (int g = 0; g < width; g++)
+                                image = (RGBPixel[,])imagecpy.Clone();
+                        // if(!t.Contains(image))
+
+                        KeyValuePair<RGBPixel[,], KeyValuePair<string, int>> b = new KeyValuePair<RGBPixel[,], KeyValuePair<string, int>>(image, new KeyValuePair<string, int>(seed, tab));
+                        t.Add(b);
+                        //ss = seed;
+                       
+                        
+                    }
+                   else if (coun1 + coun2 + coun3 >avg)
+                    {
+
+
+                        avg = coun1 + coun2 + coun3;
+                        //for (int y = 0; y < hight; y++)
+                        //    for (int g = 0; g < width; g++)
+                        image = (RGBPixel[,])imagecpy.Clone();
+
+
+                        KeyValuePair<RGBPixel[,], KeyValuePair<string, int>> b = new KeyValuePair<RGBPixel[,], KeyValuePair<string, int>>(image,new KeyValuePair<string, int>(ss,tab));
+                        t= new List<KeyValuePair<RGBPixel[,], KeyValuePair<string, int>>>();
+                        t.Add(b);
+                    
+
+
+                    }
+
+                }
+
+            }
+          
+            return t;
+        }
+        
         public static void huffman_encoding(RGBPixel[,] ImageMatrix)
         {
 
@@ -379,17 +523,330 @@ namespace ImageQuantization
                 sw.WriteLine();
                 Bcount += kvp.Value.Length * Bvalues[kvp.Key];
             }
-        ;
+            double comp_output = (double)(Rcount + Gcount + Bcount) / 8;
+
             sw.WriteLine("*Total = " + Bcount);
             sw.WriteLine();
             sw.WriteLine("**Compression Output**");
-            sw.WriteLine((double)(Rcount + Gcount + Bcount) / 8 + " bytes");
+            sw.WriteLine(comp_output+ " bytes");
+            sw.WriteLine();
+            sw.WriteLine("**Compression Ratio**");
+            sw.WriteLine(Math.Round(comp_output/(hight*width*3)*100,1) +"%");
+
             sw.Close();
+            fs.Close();
             MessageBox.Show("Huffman tree has been saved successflly !");
 
 
         }
-            
+        //static public byte[] StringToBytesArray(string str)
+        //{
+        //    var bitsToPad = 8 - str.Length % 8;
 
+        //    if (bitsToPad != 8)
+        //    {
+        //        var neededLength = bitsToPad + str.Length;
+        //        str = str.PadLeft(neededLength, '0');
+        //    }
+
+        //    int size = str.Length / 8;
+        //    byte[] arr = new byte[size];
+
+        //    for (int a = 0; a < size; a++)
+        //    {
+        //        arr[a] = Convert.ToByte(str.Substring(a * 8, 8), 2);
+        //    }
+
+        //    return arr;
+        //}
+        public static List<byte> ConvertStringByte(List<string> Slist) // O(N)
+        {
+            int len = Slist.Count, index1 = 0, index2 = 0, index3 = 0;
+
+            byte elem = 0;
+            List<byte> bytes = new List<byte>();
+            while (true)
+            {
+                if (index3 == Slist[index1].Length) 
+                {
+                    index1++;
+                    index3 = 0;
+                }
+
+                if (index2 == 8) // byte length
+                {
+                    bytes.Add(elem);
+                    elem = 0;
+                    index2 = 0;
+                }
+                if (index1 == len) // string list length
+                    break;
+                elem <<= 1;
+                elem += (byte)(Slist[index1][index3] - 48);
+                index3++;
+                index2++;
+                //bitscount++;
+            }
+            if (index2 != 0)
+            {
+                elem <<= (8 - index2);
+                bytes.Add(elem);
+            }
+
+            Slist = new List<string>();
+            return bytes;
+        }
+        public static void Compress_image(RGBPixel[,] ImageMatrix,string seed,int tap) //O(N^2)
+        {
+            FileStream fs = new FileStream("Encrypted_image.bin", FileMode.Create);
+            BinaryWriter bw = new BinaryWriter(fs);
+            int hight = GetHeight(ImageMatrix);
+            int width = GetWidth(ImageMatrix);
+            bw.Write(Convert.ToUInt16(hight));
+            bw.Write(Convert.ToUInt16(width));
+            bw.Write(seed);
+            bw.Write(Convert.ToUInt16(tap));
+            Dictionary<int, int> Rvalues = new Dictionary<int, int>();
+            Dictionary<int, int> Gvalues = new Dictionary<int, int>();
+            Dictionary<int, int> Bvalues = new Dictionary<int, int>();
+
+           
+           
+            ///initiallize dictionary with 0
+            for (int i = 0; i < hight; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    Rvalues[ImageMatrix[i, j].red] = 0;
+                    Gvalues[ImageMatrix[i, j].green] = 0;
+                    Bvalues[ImageMatrix[i, j].blue] = 0;
+                }
+            }
+            for (int i = 0; i < hight; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    //when exist 
+                    Rvalues[ImageMatrix[i, j].red]++;
+                    Gvalues[ImageMatrix[i, j].green]++;
+                    Bvalues[ImageMatrix[i, j].blue]++;
+
+                }
+            }
+            bw.Write(Convert.ToUInt16(Rvalues.Count));
+            foreach (KeyValuePair<int,int> K in Rvalues)
+            {
+                byte[] bb = BitConverter.GetBytes(K.Value);
+
+                bw.Write(Convert.ToByte(K.Key));
+                bw.Write(Convert.ToByte(bb[0]));
+                bw.Write(Convert.ToByte(bb[1]));
+                bw.Write(Convert.ToByte(bb[2]));
+
+            }
+            bw.Write(Convert.ToUInt16(Gvalues.Count));
+            foreach (KeyValuePair<int, int> K in Gvalues)
+            {
+                byte[] bb = BitConverter.GetBytes(K.Value);
+
+                bw.Write(Convert.ToByte(K.Key));
+                bw.Write(Convert.ToByte(bb[0]));
+                bw.Write(Convert.ToByte(bb[1]));
+                bw.Write(Convert.ToByte(bb[2]));
+            }
+            bw.Write(Convert.ToUInt16(Bvalues.Count));
+            foreach (KeyValuePair<int, int> K in Bvalues)
+            {
+                byte[] bb = BitConverter.GetBytes(K.Value);
+
+                bw.Write(Convert.ToByte(K.Key));
+                bw.Write(Convert.ToByte(bb[0]));
+                bw.Write(Convert.ToByte(bb[1]));
+                bw.Write(Convert.ToByte(bb[2]));
+            }
+
+            HuffmanTree tree1 = new HuffmanTree(Rvalues);
+            HuffmanTree tree2 = new HuffmanTree(Gvalues);
+            HuffmanTree tree3 = new HuffmanTree(Bvalues);
+            Dictionary<int, string> Redtree = tree1.CreateEncodings();
+            Dictionary<int, string> Greentree = tree2.CreateEncodings();
+            Dictionary<int, string> Bluetree = tree3.CreateEncodings();
+            List<string> R_binstream = new List<string>();
+            List<string> G_binstream = new List<string>();
+            List<string> B_binstream = new List<string>();
+            for (int i = 0; i < hight; i++)
+                for (int j = 0; j < width; j++)
+                {
+                    R_binstream.Add(Redtree[ImageMatrix[i, j].red]);
+                   
+                    G_binstream.Add(Greentree[ImageMatrix[i, j].green]);
+
+                    B_binstream.Add(Bluetree[ImageMatrix[i, j].blue]);
+
+                }
+          
+            byte[] b = ConvertStringByte(R_binstream).ToArray();
+            bw.Write(Convert.ToInt32(b.Length));
+            bw.Write(b);
+          
+            b = ConvertStringByte(G_binstream).ToArray();
+            bw.Write(Convert.ToInt32(b.Length));
+            bw.Write(b);
+            b = ConvertStringByte(B_binstream).ToArray();
+            bw.Write(Convert.ToInt32(b.Length));
+            bw.Write(b);
+
+          
+            bw.Close();
+            fs.Close();
+           
+        }
+
+        public static RGBPixel[,] Decompress_image(string path ,ref string  seed,ref int tap,ref int height,ref int width) //O(N^2)
+        {
+            
+            FileStream fs = new FileStream(@path, FileMode.Open);
+            BinaryReader br = new BinaryReader(fs);
+            height = br.ReadUInt16();
+            width = br.ReadUInt16();
+            seed = br.ReadString();
+            tap = br.ReadUInt16();
+            RGBPixel[,] ImageMatrix = new RGBPixel[height, width];
+            Dictionary<int,int> RedTreeList = new Dictionary<int, int>();
+            Dictionary<int, int> GreenTreeList = new Dictionary<int, int>();
+            Dictionary<int, int> BlueTreeList = new Dictionary<int, int>();
+            List<byte> Redstream = new List<byte>();
+            List<byte> Greenstream = new List<byte>();
+            List<byte> Bluestream = new List<byte>();
+           uint b= br.ReadUInt16();
+            while(b!=0)
+            {
+                int key = br.ReadByte();
+                byte[] bb = new byte[4];
+                bb[0] = br.ReadByte();
+                bb[1] = br.ReadByte();
+                bb[2] = br.ReadByte();
+                bb[3] = 0;
+                int value = BitConverter.ToInt32(bb, 0);
+                RedTreeList.Add(key, value);
+                b--;
+            }
+            b = br.ReadUInt16();
+            while (b != 0)
+            {
+                int key = br.ReadByte();
+                byte[] bb = new byte[4];
+                bb[0] = br.ReadByte();
+                bb[1] = br.ReadByte();
+                bb[2] = br.ReadByte();
+                bb[3] = 0;
+                int value = BitConverter.ToInt32(bb, 0);
+                GreenTreeList.Add(key, value);
+                b--;
+            }
+            b = br.ReadUInt16();
+            while (b != 0)
+            {
+                int key = br.ReadByte();
+                byte[] bb = new byte[4];
+                bb[0] = br.ReadByte();
+                bb[1] = br.ReadByte();
+                bb[2] = br.ReadByte();
+                bb[3] = 0;
+                int value = BitConverter.ToInt32(bb, 0);
+                BlueTreeList.Add(key,value);
+                b--;
+            }
+          
+            int size = br.ReadInt32();
+            Redstream.AddRange(br.ReadBytes(size));
+            size = br.ReadInt32();
+            Greenstream.AddRange(br.ReadBytes(size));
+            size = br.ReadInt32();
+            Bluestream.AddRange(br.ReadBytes(size));
+            br.Close();
+            fs.Close();
+            HuffmanTree tree1 = new HuffmanTree(RedTreeList);
+            HuffmanTree tree2 = new HuffmanTree(GreenTreeList);
+            HuffmanTree tree3 = new HuffmanTree(BlueTreeList);
+            HuffmanNode Redtree = tree1.root;
+            HuffmanNode Greentree = tree2.root;
+            HuffmanNode Bluetree = tree3.root;
+            int index = 0,count=0;
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    HuffmanNode N = Redtree.Clone();
+                    while(N.Left!=null)
+                    {
+                        if(count==8 )
+                        {
+                            count = 0;
+                            index++;
+                        }
+                        if((Redstream[index]&(1<<7))!=0)
+                            N = N.Right;
+                        else
+                            N = N.Left;
+                        count++;
+                        Redstream[index] <<= 1;
+                    }
+                    ImageMatrix[i, j].red =(byte) N.Value;
+                }
+            }
+            count = 0;index = 0;
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    HuffmanNode N = Greentree.Clone();
+                    while (N.Left != null)
+                    {
+                        if (count == 8)
+                        {
+                            count = 0;
+                            
+                            index++;
+                           
+                        }
+                        if ((Greenstream[index] & (1 << 7)) != 0)
+                            N = N.Right;
+                        else
+                            N = N.Left;
+                        count++;
+                        Greenstream[index] <<= 1;
+                    }
+                    ImageMatrix[i, j].green = (byte)N.Value;
+                }
+            }
+            count = 0; index = 0;
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                {
+                    HuffmanNode N = Bluetree.Clone();
+                    while (N.Left != null)
+                    {
+                        if (count == 8)
+                        {
+                            count = 0;
+                            index++;
+                        }
+                        if ((Bluestream[index] & (1 << 7)) != 0)
+                            N = N.Right;
+                        else
+                            N = N.Left;
+                        count++;
+                        Bluestream[index] <<= 1;
+                    }
+                    ImageMatrix[i, j].blue = (byte)N.Value;
+                }
+            }
+            return ImageMatrix;
+
+
+        }
+   
     }
 }
